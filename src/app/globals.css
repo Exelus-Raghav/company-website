@@ -1,26 +1,210 @@
 @import "tailwindcss";
 
+/* ==========================================================================
+   Design tokens
+   --------------------------------------------------------------------------
+   Every colour, typeface, type size and spacing value used by the site is
+   defined here. When the company's real brand identity is available, change
+   the values in this block; components should not need to be edited.
+   ========================================================================== */
+
+@theme {
+  /* Colour: a cool, light editorial palette with one deep surface colour
+     ("petrol") and a single warm accent ("amber") reserved for dark surfaces.
+     Placeholder values until brand colours are supplied. */
+  --color-paper: #f6f7f5;
+  --color-stone: #e9ece8;
+  --color-stone-deep: #d3d8d4;
+  --color-ink: #141a1d;
+  --color-graphite: #4a555c;
+  --color-rule: #c8cfca;
+
+  --color-petrol: #0f3238;
+  --color-petrol-raised: #15414a;
+  --color-petrol-deep: #0a2226;
+  --color-on-petrol: #eef3f1;
+  --color-on-petrol-muted: #b7c6c3;
+  --color-rule-on-petrol: #2f5860;
+
+  --color-amber: #d9a03a;
+  --color-amber-bright: #e6b256;
+
+  /* Typefaces (self-hosted in src/app/fonts, wired up in layout.tsx). */
+  --font-serif: var(--font-newsreader), "Iowan Old Style", "Palatino Linotype",
+    Georgia, serif;
+  --font-sans: var(--font-hanken), system-ui, -apple-system, "Segoe UI",
+    Roboto, sans-serif;
+
+  /* Type scale. Fluid between mobile and desktop; rem-based so the large
+     desktop root-size step below scales everything together. */
+  --text-display: clamp(2.875rem, 1.35rem + 5.6vw, 6.5rem);
+  --text-display--line-height: 1;
+  --text-display--letter-spacing: -0.03em;
+
+  --text-h2: clamp(2.125rem, 1.45rem + 2.5vw, 3.875rem);
+  --text-h2--line-height: 1.06;
+  --text-h2--letter-spacing: -0.022em;
+
+  --text-statement: clamp(1.75rem, 1.2rem + 1.9vw, 3rem);
+  --text-statement--line-height: 1.16;
+  --text-statement--letter-spacing: -0.016em;
+
+  --text-h3: clamp(1.5rem, 1.25rem + 0.9vw, 2.125rem);
+  --text-h3--line-height: 1.15;
+  --text-h3--letter-spacing: -0.012em;
+
+  --text-lead: clamp(1.1875rem, 1.05rem + 0.5vw, 1.5rem);
+  --text-lead--line-height: 1.5;
+
+  --text-body: 1.0625rem;
+  --text-body--line-height: 1.65;
+
+  --text-small: 0.9375rem;
+  --text-small--line-height: 1.55;
+
+  --text-caption: 0.8125rem;
+  --text-caption--line-height: 1.5;
+
+  /* Extra-large desktop breakpoint (1920px). */
+  --breakpoint-3xl: 120rem;
+}
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --container: 90rem;
+  --gutter: clamp(1.25rem, 0.5rem + 3.6vw, 4rem);
+  --section-y: clamp(4.5rem, 2.25rem + 8vw, 10rem);
+  --header-h: 4.5rem;
+  --focus: var(--color-petrol);
+  /* Secondary text and hairlines. Dark surfaces override these below. */
+  --muted: var(--color-graphite);
+  --line: var(--color-rule);
+  color-scheme: light;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
+/* Very large screens: scale the rem base a step so the layout keeps its
+   proportions instead of floating in whitespace. */
+@media (min-width: 120rem) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --header-h: 5rem;
+  }
+  html {
+    font-size: 112.5%;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* ==========================================================================
+   Base
+   ========================================================================== */
+
+@layer base {
+  html {
+    /* Keeps anchored sections clear of the sticky header. */
+    scroll-padding-top: calc(var(--header-h) + 1.5rem);
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+
+  /* Smooth in-page scrolling only for people who have not asked for less motion. */
+  @media (prefers-reduced-motion: no-preference) {
+    html {
+      scroll-behavior: smooth;
+    }
+  }
+
+  body {
+    background: var(--color-paper);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-size: var(--text-body);
+    line-height: var(--text-body--line-height);
+    font-optical-sizing: auto;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-serif);
+    font-weight: 350;
+    text-wrap: balance;
+    font-optical-sizing: auto;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  ::selection {
+    background: var(--color-petrol);
+    color: var(--color-paper);
+  }
+
+  /* Visible keyboard focus everywhere; dark surfaces switch the ring colour. */
+  :focus-visible {
+    outline: 2px solid var(--focus);
+    outline-offset: 3px;
+  }
+
+  [data-surface="dark"] {
+    --focus: var(--color-amber);
+    --muted: var(--color-on-petrol-muted);
+    --line: var(--color-rule-on-petrol);
+  }
+}
+
+/* ==========================================================================
+   Placeholder content
+   --------------------------------------------------------------------------
+   Any text in src/content wrapped in [square brackets] is a placeholder. It is
+   rendered with a quiet dotted underline so it is recognisable but does not
+   dominate the layout. Replace the bracketed text with real content and the
+   marking disappears.
+   ========================================================================== */
+
+[data-placeholder] {
+  text-decoration-line: underline;
+  text-decoration-style: dotted;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.22em;
+  text-decoration-color: color-mix(in srgb, currentColor 40%, transparent);
+}
+
+/* ==========================================================================
+   Image plates
+   --------------------------------------------------------------------------
+   Toned fields with a fine grain, standing in for company photography. When a
+   real image is supplied the plate keeps its aspect ratio and the image fills
+   it (see components/ui/ImageFrame.tsx).
+   ========================================================================== */
+
+.plate-grain::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.16;
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.9 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+}
+
+[data-tone="petrol"].plate-grain::after {
+  mix-blend-mode: screen;
+  opacity: 0.09;
+}
+
+/* One quiet reveal for the hero imagery. Disabled for reduced motion. */
+@media (prefers-reduced-motion: no-preference) {
+  .hero-reveal {
+    animation: hero-reveal 900ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  }
+  @keyframes hero-reveal {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
 }
